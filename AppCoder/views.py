@@ -1,7 +1,9 @@
 from django.shortcuts import render
-from .models import Curso, Profesor
+from .models import Curso, Profesor, Estudiante
 from django.http import HttpResponse
+from django.urls import reverse_lazy
 from AppCoder.forms import CursoForm, ProfeForm
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 # Create your views here.
 
@@ -73,12 +75,13 @@ def profeFormulario(request):  # Creación de formulario
             profesion=informacion["profesion"]            
             profe= Profesor(nombre=nombre, apellido=apellido, email= email, profesion=profesion)
             profe.save()
-            return render (request, "AppCoder/inicio.html", {"mensaje": "Profesor guardado correctamente"})
+            profesores=Profesor.objects.all()
+            return render (request, "AppCoder/leerProfesores.html", {"profesores": profesores, "mensaje": "Profesor guardado correctamente"})
         else:
             return render (request, "AppCoder/profeFormulario.html", {"form": form, "mensaje": "Información no válida"})
 
     else: #sino viene por GET y el formulario viene vacío
-        formulario= ProfeForm()
+        formulario= ProfeForm() #formulario vacío
         return render (request, "AppCoder/profeFormulario.html", {"form": formulario})
 
 
@@ -94,4 +97,56 @@ def buscar(request):
     else:
         return render (request, "AppCoder/busquedaComision.html", {"mensaje": "Ingresa una comisión a buscar!"})
 
+def leerProfesores(request):
+    profesores=Profesor.objects.all()
+    return render (request, "AppCoder/leerProfesores.html", {"profesores": profesores})
 
+def eliminarProfesor(request, id):
+    profesor=Profesor.objects.get(id=id)
+    profesor.delete()
+    profesores=Profesor.objects.all()
+    return render (request, "AppCoder/leerProfesores.html", {"profesores": profesores, "mensaje": "Profesor eliminado"})
+
+
+def editarProfesor(request, id):
+    profesor=Profesor.objects.get(id=id)
+    if request.method=="POST":
+        form= ProfeForm(request.POST) #por POST el formulario viene lleno        
+        if form.is_valid():
+            info=form.cleaned_data #convierte la info en modo formulario a un diccionario más facil de leer
+            profesor.nombre=info["nombre"]
+            profesor.apellido=info["apellido"]
+            profesor.email=info["email"]
+            profesor.profesion=info["profesion"]     
+            profesor.save()
+            profesores=Profesor.objects.all()
+            return render (request, "AppCoder/leerProfesores.html", {"profesores": profesores, "mensaje": "Profesor editado correctamente"})
+        pass
+    else:
+        formulario=ProfeForm(initial={"nombre":profesor.nombre, "apellido":profesor.apellido, "email": profesor.email, "profesion": profesor.profesion})
+        return render (request, "AppCoder/editarProfesor.html", {"form": formulario, "profesor": profesor})
+
+
+#..........VISTAS BASADAS EN CLASES
+
+class EstudianteList(ListView): #vista usada para LISTAR
+    model=Estudiante #model que quiero mostrar
+    template_name="AppCoder/estudiantes.html" #template que uso
+
+class EstudianteCreacion(CreateView): #vista usada para CREAR
+    model=Estudiante #model que quiero mostrar
+    success_url= reverse_lazy("estudiante_list")
+    fields=['nombre', 'apellido', 'email']
+
+class EstudianteUpdate(UpdateView): #vista usada para EDITAR
+    model=Estudiante #model que quiero mostrar
+    success_url= reverse_lazy("estudiante_list")
+    fields=['nombre', 'apellido', 'email']
+
+class EstudianteDetalle(DetailView): #vista usada para MOSTRAR DATOS
+    model=Estudiante #model que quiero mostrar
+    template_name="AppCoder/estudiante_detalle.html" #template que uso
+
+class EstudianteDelete(DeleteView): #vista usada para ELIMINAR
+    model=Estudiante #model que quiero mostrar
+    success_url= reverse_lazy("estudiante_list")
