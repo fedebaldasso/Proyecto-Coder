@@ -1,0 +1,30 @@
+{% extends "AppCoder/padre.html" %}
+
+{% load static %}
+
+{% block titulo %}
+<h1 class="mb-5">FORMULARIO PARA EDITAR PERSONAS</h1>
+{% endblock %}
+
+
+{% block contenido_que_cambia %}
+
+<h2>EDITANDO PERSONA: {{ persona }} </h2>
+
+<h3>{{ mensaje }}</h3>
+
+<form action="{% url 'editarPersona' persona.id %}" method="POST"> {% csrf_token %}
+    
+    <table>
+        {{ form.as_table }}
+    </table>
+
+    <input type="submit" value="Guardar Cambios">
+
+
+
+</form>
+
+
+
+{% endblock %}

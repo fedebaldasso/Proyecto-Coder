@@ -1,0 +1,32 @@
+{% extends "AppCoder/padre.html" %}
+
+{% load static %}
+
+{% block titulo %}
+<h1 class="mb-5">FORMULARIO PARA AGREGAR PERSONAS</h1>
+{% endblock %}
+
+
+{% block contenido_que_cambia %}
+
+<h3>{{ mensaje }}</h3>
+
+<h2>AGREGANDO PERSONA</h2>
+
+<form action="{% url 'agregarPersona' %}" method="POST"> {% csrf_token %} 
+    <!-- el csrf_token es para validar al usuario que realiza los cambios -->
+    
+    
+    <table>
+        {{ form.as_table }}
+    </table>
+
+    <input type="submit" value="Guardar Persona">
+
+
+
+</form>
+
+
+
+{% endblock %}

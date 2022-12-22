@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import Curso, Profesor, Estudiante
+from .models import Curso, Profesor, Estudiante, Persona
 from django.http import HttpResponse
 from django.urls import reverse_lazy
-from AppCoder.forms import CursoForm, ProfeForm
+from AppCoder.forms import CursoForm, ProfeForm, PersonaForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 # Create your views here.
@@ -61,7 +61,6 @@ def cursoFormulario(request):  # Creación de formulario
         formulario= CursoForm()
         return render (request, "AppCoder/cursoFormulario.html", {"form": formulario})
 
-
 def profeFormulario(request):  # Creación de formulario
     if request.method=="POST":
         form= ProfeForm(request.POST) #por POST el formulario viene lleno
@@ -84,7 +83,6 @@ def profeFormulario(request):  # Creación de formulario
         formulario= ProfeForm() #formulario vacío
         return render (request, "AppCoder/profeFormulario.html", {"form": formulario})
 
-
 def busquedaComision(request):
     return render(request, "AppCoder/busquedaComision.html")
 
@@ -106,7 +104,6 @@ def eliminarProfesor(request, id):
     profesor.delete()
     profesores=Profesor.objects.all()
     return render (request, "AppCoder/leerProfesores.html", {"profesores": profesores, "mensaje": "Profesor eliminado"})
-
 
 def editarProfesor(request, id):
     profesor=Profesor.objects.get(id=id)
@@ -150,3 +147,59 @@ class EstudianteDetalle(DetailView): #vista usada para MOSTRAR DATOS
 class EstudianteDelete(DeleteView): #vista usada para ELIMINAR
     model=Estudiante #model que quiero mostrar
     success_url= reverse_lazy("estudiante_list")
+
+#................
+
+def leerPersonas(request):
+    personas=Persona.objects.all()
+    return render (request, "AppCoder/leerPersonas.html", {"personas": personas})
+
+def agregarPersona(request):
+    if request.method=="POST":
+        form= PersonaForm(request.POST) #por POST el formulario viene lleno
+        
+        if form.is_valid():
+            informacion=form.cleaned_data #convierte la info en modo formulario a un diccionario más facil de leer
+            
+            nombre=informacion["nombre"]
+            apellido=informacion["apellido"]
+            dni=informacion["dni"]
+            email=informacion["email"]
+            fecha_nacimiento=informacion["fecha_nacimiento"]
+            tieneObraSocial=informacion["tieneObraSocial"]            
+            persona= Persona(nombre=nombre, apellido=apellido, dni=dni, email= email, fecha_nacimiento=fecha_nacimiento, tieneObraSocial=tieneObraSocial )
+            persona.save()
+            personas=Persona.objects.all()
+            return render (request, "AppCoder/leerPersonas.html", {"personas": personas, "mensaje": "Persona guardada correctamente"})
+        else:
+            return render (request, "AppCoder/agregarPersona.html", {"form": form, "mensaje": "Información no válida"})
+
+    else: #sino viene por GET y el formulario viene vacío
+        form= PersonaForm() #formulario vacío
+        return render (request, "AppCoder/agregarPersona.html", {"form": form})
+
+def editarPersona(request, id):
+    persona=Persona.objects.get(id=id)
+    if request.method=="POST":
+        form= PersonaForm(request.POST) #por POST el formulario viene lleno        
+        if form.is_valid():
+            info=form.cleaned_data #convierte la info en modo formulario a un diccionario más facil de leer
+            persona.nombre=info["nombre"]
+            persona.apellido=info["apellido"]
+            persona.dni=info["dni"]
+            persona.email=info["email"]
+            persona.fecha_nacimiento=info["fecha_nacimiento"]
+            persona.tieneObraSocial=info["tieneObraSocial"]           
+            persona.save()
+            personas=Persona.objects.all()
+            return render (request, "AppCoder/leerPersonas.html", {"personas": personas, "mensaje": "Persona editada correctamente"})
+        pass
+    else:
+        form=PersonaForm(initial={"nombre":persona.nombre, "apellido":persona.apellido, "dni": persona.dni, "email": persona.email, "fecha_nacimiento": persona.fecha_nacimiento})
+        return render (request, "AppCoder/editarPersona.html", {"form": form, "persona": persona})
+
+def eliminarPersona(request, id):
+    persona=Persona.objects.get(id=id)
+    persona.delete()
+    personas=Persona.objects.all()
+    return render (request, "AppCoder/leerPersonas.html", {"personas": personas, "mensaje": "Persona eliminada correctamente"})

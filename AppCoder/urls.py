@@ -24,6 +24,10 @@ urlpatterns = [
     path('estudiante/borrar/<pk>', EstudianteDelete.as_view(), name="estudiante_borrar"),
     path('estudiante/editar/<pk>', EstudianteUpdate.as_view(), name="estudiante_editar"),
 
+    path('leerPersonas/', leerPersonas, name="leerPersonas"),
+    path('agregarPersona/', agregarPersona, name="agregarPersona"),
+    path('editarPersona/<id>', editarPersona, name="editarPersona"),
+    path('eliminarPersona/<id>', eliminarPersona, name="eliminarPersona"),
 
 
 
