@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Landing Page - Start Bootstrap Theme</title>
+        <title>Proyecto Coder</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Bootstrap icons-->
@@ -20,13 +20,22 @@
         <!-- Navigation-->
         <nav class="navbar navbar-light bg-light static-top">
             <div class="container">
-                <a class="navbar-brand" href="{% url 'inicio' %}">INICIO</a>
+                <a class="navbar-brand" href="{% url 'inicio' %}">INICIO</a>                
+
+                {%if user.is_authenticated %}
                 <a class="btn btn-primary" href="{% url 'leerPersonas' %}">Personas</a>
                 <a class="btn btn-primary" href="{% url 'cursos' %}">Cursos</a>
                 <a class="btn btn-primary" href="{% url 'leerProfesores' %}">Profesores</a>
                 <a class="btn btn-primary" href="{% url 'estudiantes' %}">Estudiantes</a>
                 <a class="btn btn-primary" href="{% url 'entregables' %}">Entregables</a>
                 
+                <a class="btn btn-danger" href="{% url 'logout' %}">CERRAR SESIÓN</a>
+                <p>Bienvenido: {{ user.username }}</p>
+                <img src="{{ avatar }}" alt="">
+                {% else %}              
+                <a class="btn btn-dark" href="{% url 'register' %}">REGISTRO</a>
+                <a class="btn btn-dark" href="{% url 'login' %}">INGRESAR</a>
+                {% endif %}               
             </div>
         </nav>
         <!-- Masthead-->
